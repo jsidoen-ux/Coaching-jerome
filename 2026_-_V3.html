@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coaching Jérôme – V3 (Juin)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lime: #C6F135; --lime-dark: #9DC420;
+    --bg: #0A0A0A; --card: #131313; --card2: #1A1A1A;
+    --border: #252525; --text: #E8E8E8; --muted: #777;
+    --red: #FF4545; --blue: #4DABF7; --orange: #FF9500;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; min-height:100vh; }
+
+  /* HEADER */
+  header { background:var(--card); border-bottom:2px solid var(--lime); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .logo { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:1.5rem; letter-spacing:2px; color:var(--lime); text-transform:uppercase; }
+  .logo span { color:var(--text); }
+  .logo-version { font-size:0.72rem; background:#1e2e00; color:var(--lime); border:1px solid var(--lime-dark); border-radius:4px; padding:2px 8px; letter-spacing:1px; font-weight:700; margin-left:10px; vertical-align:middle; }
+  .stats-row { display:flex; gap:7px; flex-wrap:wrap; }
+  .stat-chip { background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+  .stat-chip strong { color:var(--lime); font-size:0.9rem; }
+  .stat-chip.chip-week { border-color:#1e2e1e; }
+  .stat-chip.chip-phase { border-color:#2a2200; }
+  .stat-chip.chip-phase strong { color:var(--orange); }
+
+  /* MACRO BANNER */
+  .macro-banner { background:linear-gradient(135deg,#0F1A00 0%,#131313 60%); border-bottom:1px solid var(--border); padding:14px 20px; }
+  .macro-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.73rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:10px; }
+  .macros-grid { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  .macro-item { display:flex; flex-direction:column; gap:2px; }
+  .macro-label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .macro-value { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:1.5rem; line-height:1; }
+  .macro-value.kcal { color:var(--lime); }
+  .macro-value.prot { color:var(--blue); }
+  .macro-value.carb { color:var(--orange); }
+  .macro-value.fat  { color:#FF6B6B; }
+  .macro-sep { color:var(--border); font-size:1.4rem; }
+  .macro-note { font-size:0.7rem; color:var(--muted); margin-left:auto; font-style:italic; max-width:260px; line-height:1.4; }
+
+  /* TABS */
+  .tabs { display:flex; background:var(--card); border-bottom:1px solid var(--border); padding:0 20px; gap:4px; overflow-x:auto; }
+  .tab-btn { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.92rem; letter-spacing:1.5px; text-transform:uppercase; background:none; border:none; border-bottom:3px solid transparent; color:var(--muted); padding:13px 18px 10px; cursor:pointer; white-space:nowrap; transition:all .2s; }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { color:var(--lime); border-bottom-color:var(--lime); }
+
+  /* CONTENT */
+  .content { padding:20px; max-width:960px; margin:0 auto; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .section-label { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:1.05rem; text-transform:uppercase; letter-spacing:3px; color:var(--muted); border-left:3px solid var(--lime); padding-left:12px; margin-bottom:14px; }
+
+  /* INFO BOX */
+  .info-box { background:var(--card); border-left:3px solid var(--orange); border-radius:0 8px 8px 0; padding:13px 16px; font-size:0.83rem; line-height:1.6; color:#ACACAC; margin-bottom:22px; }
+  .info-box strong { color:var(--orange); }
+
+  /* MEAL CARDS */
+  .meal-grid { display:grid; gap:12px; margin-bottom:28px; }
+  .meal-card { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .meal-header { display:flex; align-items:center; padding:11px 15px; background:var(--card2); cursor:pointer; gap:10px; user-select:none; }
+  .meal-num { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:0.97rem; letter-spacing:1px; color:var(--lime); text-transform:uppercase; min-width:66px; }
+  .meal-timing { font-size:0.7rem; color:var(--muted); font-weight:600; letter-spacing:0.5px; text-transform:uppercase; }
+  .meal-macros-mini { display:flex; gap:7px; margin-left:auto; flex-wrap:wrap; }
+  .m-mini { font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:4px; white-space:nowrap; }
+  .m-mini.p { background:#1A2A40; color:var(--blue); }
+  .m-mini.c { background:#2A1A00; color:var(--orange); }
+  .m-mini.f { background:#2A1010; color:#FF6B6B; }
+  .m-mini.k { background:#1A2200; color:var(--lime); }
+  .meal-chev { color:var(--muted); font-size:0.75rem; flex-shrink:0; transition:transform .25s; }
+  .meal-card.open .meal-chev { transform:rotate(180deg); }
+  .meal-body { display:none; padding:13px 15px; }
+  .meal-card.open .meal-body { display:block; }
+  .food-item { display:flex; align-items:center; gap:9px; padding:5px 0; border-bottom:1px solid #1C1C1C; font-size:0.86rem; }
+  .food-item:last-of-type { border-bottom:none; }
+  .food-dot { width:5px; height:5px; background:var(--lime); border-radius:50%; flex-shrink:0; }
+  .food-qty { color:var(--lime); font-weight:700; min-width:58px; font-size:0.8rem; }
+  .food-name { color:var(--text); flex:1; }
+  .food-note { font-size:0.7rem; color:var(--muted); font-style:italic; }
+  .variant-toggle { background:none; border:1px solid var(--border); color:var(--muted); font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.76rem; letter-spacing:1px; text-transform:uppercase; padding:5px 12px; border-radius:4px; cursor:pointer; margin-top:9px; transition:all .2s; }
+  .variant-toggle:hover { border-color:var(--lime); color:var(--lime); }
+  .variant-box { display:none; margin-top:10px; background:#0F1800; border:1px solid #2A3A00; border-radius:7px; padding:11px; }
+  .variant-box.open { display:block; }
+  .variant-title { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lime); margin-bottom:6px; opacity:.8; }
+  .variant-item { font-size:0.8rem; color:#ACACAC; padding:3px 0; display:flex; gap:7px; }
+  .variant-item::before { content:"→"; color:var(--lime); flex-shrink:0; }
+
+  /* TRAINING DAY CARDS */
+  .day-card { background:var(--card); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; overflow:hidden; }
+  .day-header { display:flex; align-items:center; gap:12px; padding:13px 17px; background:var(--card2); cursor:pointer; user-select:none; }
+  .day-badge { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:0.83rem; letter-spacing:2px; text-transform:uppercase; background:var(--lime); color:#0A0A0A; padding:3px 9px; border-radius:4px; white-space:nowrap; }
+  .day-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.15rem; letter-spacing:1px; text-transform:uppercase; color:var(--text); flex:1; }
+  .day-chevron { color:var(--muted); transition:transform .2s; font-size:0.95rem; }
+  .day-card.open .day-chevron { transform:rotate(180deg); }
+  .day-body { display:none; padding:14px 16px; }
+  .day-card.open .day-body { display:block; }
+
+  /* EXERCISE CARDS */
+  .ex-card { background:#0D0D0D; border:1px solid #1e1e1e; border-radius:8px; margin-bottom:9px; overflow:hidden; }
+  .ex-hdr { display:flex; align-items:center; gap:10px; padding:10px 13px; background:#181818; cursor:pointer; user-select:none; }
+  .ex-hdr-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.97rem; color:var(--text); flex:1; letter-spacing:0.3px; }
+  .ex-last-w { font-size:0.76rem; color:var(--lime); font-weight:700; white-space:nowrap; font-family:'Barlow Condensed',sans-serif; }
+  .ex-chev { color:var(--muted); font-size:0.72rem; flex-shrink:0; transition:transform .2s; }
+  .ex-body { display:none; padding:11px 13px; }
+  .ex-alt { font-size:0.73rem; color:var(--muted); font-style:italic; margin-bottom:11px; }
+  .ex-alt::before { content:"→ "; color:var(--lime); font-style:normal; }
+
+  .ex-box { border-radius:7px; padding:10px 11px; margin-bottom:8px; border:1px solid transparent; }
+  .ex-box:last-child { margin-bottom:0; }
+  .ex-box-wu   { background:#0a110a; border-color:#1c2a1c; }
+  .ex-box-work { background:#0a0a18; border-color:#1c1c2e; }
+  .ex-box-hist { background:#111; border-color:#1e1e1e; }
+  .ex-box-title { font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  .ex-box-hdr { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .ex-box-hdr .ex-box-title { margin-bottom:0; }
+  .target-lbl { font-size:0.75rem; color:var(--blue); font-weight:700; }
+  .rest-lbl { font-size:0.7rem; color:var(--orange); font-weight:700; letter-spacing:0.5px; margin-left:auto; white-space:nowrap; }
+
+  .wu-row { display:flex; align-items:center; gap:8px; padding:5px 7px; border-radius:5px; background:#111a11; margin-bottom:4px; min-height:30px; }
+  .wu-row:last-child { margin-bottom:0; }
+  .cell-lbl { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.78rem; min-width:22px; color:var(--lime); }
+  .cell-lbl.s { color:var(--blue); }
+  .wu-val { font-size:0.82rem; color:var(--text); font-weight:600; flex:1; }
+  .cell-pct { font-size:0.68rem; color:var(--muted); white-space:nowrap; }
+
+  .ws-row { display:flex; align-items:center; gap:8px; padding:5px 7px; border-radius:5px; background:#11111a; margin-bottom:4px; min-height:34px; }
+  .ws-row:last-child { margin-bottom:8px; }
+  .ws-slash { background:transparent !important; opacity:0.28; }
+  .ws-slash-txt { font-size:0.82rem; color:var(--muted); font-weight:600; flex:1; }
+  .weight-inp { background:#161620; border:1px solid #2e2e44; color:var(--lime); border-radius:4px; padding:4px 6px; font-family:'Barlow',sans-serif; font-weight:700; font-size:0.9rem; width:66px; text-align:center; }
+  .weight-inp:focus { outline:none; border-color:var(--blue); }
+  .reps-txt { font-size:0.74rem; color:var(--muted); white-space:nowrap; flex:1; }
+  .save-btn { background:var(--lime); color:#0A0A0A; border:none; border-radius:5px; padding:8px; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:0.83rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; width:100%; transition:opacity .2s; }
+  .save-btn:hover { opacity:.85; }
+
+  .hist-row { display:flex; gap:8px; padding:4px 0; border-bottom:1px solid #1a1a1a; font-size:0.76rem; }
+  .hist-row:last-child { border-bottom:none; }
+  .hist-d { color:var(--muted); min-width:55px; white-space:nowrap; }
+  .hist-s { color:var(--text); }
+  .no-hist { font-size:0.73rem; color:#333; font-style:italic; }
+
+  .prog-box { background:#0F1800; border:1px solid #2A3A00; border-radius:7px; padding:11px 13px; margin-top:10px; }
+  .prog-title { font-family:'Barlow Condensed',sans-serif; font-size:0.76rem; font-weight:700; letter-spacing:1.5px; color:var(--lime); text-transform:uppercase; margin-bottom:7px; }
+  .prog-item { font-size:0.8rem; color:#ACACAC; padding:2px 0; display:flex; gap:7px; }
+  .prog-item::before { content:"⚡"; flex-shrink:0; }
+
+  /* SUPPLEMENTS */
+  .supps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; margin-bottom:28px; }
+  .supp-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:11px 13px; }
+  .supp-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.93rem; color:var(--lime); margin-bottom:4px; }
+  .supp-when { font-size:0.73rem; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .supp-dose { font-size:0.76rem; color:var(--muted); margin-top:4px; line-height:1.4; }
+
+
+  @media(max-width:600px){
+    .content{padding:14px;}
+    .macro-note{display:none;}
+    .macros-grid{gap:10px;}
+    .macro-value{font-size:1.3rem;}
+    header{padding:12px 14px;}
+    .stats-row{gap:5px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Coaching <span>Jérôme</span><span class="logo-version">V3 · Juin</span></div>
+  <div class="stats-row">
+    <div class="stat-chip">Taille <strong>1.69 m</strong></div>
+    <div class="stat-chip">Départ <strong>74.4 kg</strong></div>
+    <div class="stat-chip">Début <strong>01/06/2026</strong></div>
+    <div class="stat-chip chip-week" id="chip-week">Semaine <strong>—</strong></div>
+    <div class="stat-chip chip-phase" id="chip-phase">Phase <strong>—</strong></div>
+  </div>
+</header>
+
+<div class="macro-banner">
+  <div class="macro-title">Objectif macros — Recomposition corporelle (muscle ↑ · ventre/hanches ↓)</div>
+  <div class="macros-grid">
+    <div class="macro-item"><span class="macro-label">Calories</span><span class="macro-value kcal">~2 500</span></div>
+    <span class="macro-sep">|</span>
+    <div class="macro-item"><span class="macro-label">Protéines</span><span class="macro-value prot">180 g</span></div>
+    <span class="macro-sep">|</span>
+    <div class="macro-item"><span class="macro-label">Glucides</span><span class="macro-value carb">275 g</span></div>
+    <span class="macro-sep">|</span>
+    <div class="macro-item"><span class="macro-label">Lipides</span><span class="macro-value fat">65 g</span></div>
+    <div class="macro-note">TDEE ~2 380 kcal + surplus conservateur +120 kcal. Protéines élevées (2.4g/kg). Glucides modérés pour limiter stockage abdominal.</div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('diet',this)">🥩 Alimentation</button>
+  <button class="tab-btn" onclick="switchTab('training',this)">🏋️ Entraînement</button>
+  <button class="tab-btn" onclick="switchTab('supplements',this)">💊 Suppléments</button>
+  <button class="tab-btn" onclick="switchTab('poids',this)">📊 Suivi Poids</button>
+</nav>
+
+<div class="content">
+
+<!-- ===== DIET TAB ===== -->
+<div id="tab-diet" class="tab-panel active">
+  <div class="info-box">
+    <strong>Plan alimentaire V3 :</strong> ~2 435 kcal / 178g P / 273g G / 65g F (hors Collagen Pro). Cliquer sur un repas pour le déplier/replier.
+  </div>
+  <div class="section-label">Plan alimentaire – 5 repas</div>
+  <div class="meal-grid">
+
+    <!-- REPAS 1 -->
+    <div class="meal-card open">
+      <div class="meal-header" onclick="toggleMeal(this)">
+        <span class="meal-num">Repas 1</span>
+        <span class="meal-timing">Petit-déjeuner · 6h00</span>
+        <div class="meal-macros-mini">
+          <span class="m-mini k">~430 kcal</span><span class="m-mini p">P 27g</span><span class="m-mini c">G 56g</span><span class="m-mini f">F 10g</span>
+        </div>
+        <span class="meal-chev">▼</span>
+      </div>
+      <div class="meal-body">
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">2 entiers</span><span class="food-name">Œufs entiers</span><span class="food-note">omelette ou brouillés</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">3 blancs</span><span class="food-name">Blancs d'œuf</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">2 tranches</span><span class="food-name">Pain blanc XXL</span><span class="food-note">~80g</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">100 g</span><span class="food-name">Pomme</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">1 dose</span><span class="food-name">Collagen Pro</span><span class="food-note">+25g P · pris à part, non comptés dans les macros ci-dessus</span></div>
+        <button class="variant-toggle" onclick="toggleVariantBox(this)">+ Variantes équivalentes</button>
+        <div class="variant-box">
+          <div class="variant-title">Variante A – Pancakes protéinés</div>
+          <div class="variant-item">2 œufs + 3 blancs + 50g flocons d'avoine + 1 banane (70g) · mixer et cuire à la poêle</div>
+          <div class="variant-title" style="margin-top:8px">Variante B – Pain + œufs brouillés</div>
+          <div class="variant-item">2 œufs + 3 blancs brouillés + 2 tranches pain blanc + 15g confiture ou miel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPAS 2 -->
+    <div class="meal-card open">
+      <div class="meal-header" onclick="toggleMeal(this)">
+        <span class="meal-num">Repas 2</span>
+        <span class="meal-timing">Collation · ~9h00</span>
+        <div class="meal-macros-mini">
+          <span class="m-mini k">~295 kcal</span><span class="m-mini p">P 31g</span><span class="m-mini c">G 20g</span><span class="m-mini f">F 11g</span>
+        </div>
+        <span class="meal-chev">▼</span>
+      </div>
+      <div class="meal-body">
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">30 g</span><span class="food-name">Whey isolate</span><span class="food-note">shaker eau</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">70 g</span><span class="food-name">Banane</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">20 g</span><span class="food-name">Amandes</span></div>
+        <button class="variant-toggle" onclick="toggleVariantBox(this)">+ Variantes équivalentes</button>
+        <div class="variant-box">
+          <div class="variant-title">Variante A – Fromage blanc</div>
+          <div class="variant-item">150g fromage blanc 0% + 30g whey + 100g myrtilles + 20g amandes</div>
+          <div class="variant-title" style="margin-top:8px">Variante B – Rice cake</div>
+          <div class="variant-item">3 galettes de riz (30g) + 20g beurre de cacahuète + 30g whey shaker</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPAS 3 -->
+    <div class="meal-card open">
+      <div class="meal-header" onclick="toggleMeal(this)">
+        <span class="meal-num">Repas 3</span>
+        <span class="meal-timing">Déjeuner · ~12h00</span>
+        <div class="meal-macros-mini">
+          <span class="m-mini k">~640 kcal</span><span class="m-mini p">P 40g</span><span class="m-mini c">G 82g</span><span class="m-mini f">F 14g</span>
+        </div>
+        <span class="meal-chev">▼</span>
+      </div>
+      <div class="meal-body">
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">350 g</span><span class="food-name">Pommes de terre</span><span class="food-note">marmite ou purée (lait d'amande) · → 250g jours off</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">120 g</span><span class="food-name">Poulet vapeur</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">100 g</span><span class="food-name">Légumes (brocoli, courgette, épinards…)</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">10 ml</span><span class="food-name">Huile d'olive</span><span class="food-note">assaisonnement</span></div>
+        <button class="variant-toggle" onclick="toggleVariantBox(this)">+ Variantes équivalentes</button>
+        <div class="variant-box">
+          <div class="variant-title">Variante A – Pâtes + poulet</div>
+          <div class="variant-item">80g pâtes crues (~200g cuites) + 120g poulet vapeur + 100g légumes + 10ml huile d'olive · → 60g pâtes jours off</div>
+          <div class="variant-title" style="margin-top:8px">Variante B – Riz jasmin</div>
+          <div class="variant-item">250g riz jasmin cuit + 120g poulet vapeur ou thon + 100g légumes + 10ml huile · → 200g riz jours off</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPAS 4 -->
+    <div class="meal-card open">
+      <div class="meal-header" onclick="toggleMeal(this)">
+        <span class="meal-num">Repas 4</span>
+        <span class="meal-timing">Goûter pré-training · ~15h30</span>
+        <div class="meal-macros-mini">
+          <span class="m-mini k">~370 kcal</span><span class="m-mini p">P 30g</span><span class="m-mini c">G 58g</span><span class="m-mini f">F 2g</span>
+        </div>
+        <span class="meal-chev">▼</span>
+      </div>
+      <div class="meal-body">
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">50 g</span><span class="food-name">Corn flakes</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">15 g</span><span class="food-name">Miel</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">30 g</span><span class="food-name">Whey isolate</span><span class="food-note">shaker eau</span></div>
+        <button class="variant-toggle" onclick="toggleVariantBox(this)">+ Variantes équivalentes</button>
+        <div class="variant-box">
+          <div class="variant-title">Variante A – Banane + whey</div>
+          <div class="variant-item">2 bananes (140g) + 30g whey shaker eau · simple et rapide</div>
+          <div class="variant-title" style="margin-top:8px">Variante B – Pain + whey</div>
+          <div class="variant-item">2 tranches pain blanc + 15g miel + 30g whey shaker eau</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPAS 5 -->
+    <div class="meal-card open">
+      <div class="meal-header" onclick="toggleMeal(this)">
+        <span class="meal-num">Repas 5</span>
+        <span class="meal-timing">Dîner · ~20h00</span>
+        <div class="meal-macros-mini">
+          <span class="m-mini k">~700 kcal</span><span class="m-mini p">P 50g</span><span class="m-mini c">G 57g</span><span class="m-mini f">F 28g</span>
+        </div>
+        <span class="meal-chev">▼</span>
+      </div>
+      <div class="meal-body">
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">90 g</span><span class="food-name">Pâtes (crues)</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">180 g</span><span class="food-name">Bœuf haché 5% MG</span><span class="food-note">ou bavette ou bœuf à fondue</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">100 g</span><span class="food-name">Légumes</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">5 ml</span><span class="food-name">Huile d'olive</span><span class="food-note">assaisonnement légumes</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">20 g</span><span class="food-name">Chocolat noir 70%</span><span class="food-note">anti-oxydants + satiété</span></div>
+        <div class="food-item"><div class="food-dot"></div><span class="food-qty">1 dose</span><span class="food-name">Collagen Pro</span><span class="food-note">+25g P · avant coucher 21h30, non comptés ci-dessus</span></div>
+        <button class="variant-toggle" onclick="toggleVariantBox(this)">+ Variantes équivalentes</button>
+        <div class="variant-box">
+          <div class="variant-title">Variante A – Poulet + riz complet</div>
+          <div class="variant-item">300g riz complet cuit + 180g poulet vapeur + 100g légumes + 5ml huile + 20g chocolat</div>
+          <div class="variant-title" style="margin-top:8px">Variante B – Bœuf + pommes de terre</div>
+          <div class="variant-item">300g pommes de terre marmite + 180g bœuf haché 5% + 100g légumes + 5ml huile + 20g chocolat</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /meal-grid -->
+  <div class="info-box" style="border-color:var(--lime);">
+    <strong style="color:var(--lime)">Total journalier (plan alimentaire) :</strong> ~2 435 kcal · P ~178g · G ~273g · F ~65g<br>
+    <strong style="color:var(--blue)">+ Collagen Pro :</strong> 2 doses = +50g P supplémentaires (non comptés dans l'objectif plan · usage tendineux/articulaire)<br>
+    <span style="font-size:0.8rem">Si balance stable après 2 semaines → ajouter 30g pommes de terre (repas 3) ou 1 tranche pain (repas 1).</span>
+  </div>
+</div>
+
+<!-- ===== TRAINING TAB ===== -->
+<div id="tab-training" class="tab-panel">
+  <div class="info-box">
+    <strong>Comment utiliser :</strong> Ouvrir un exercice → saisir le poids en <strong style="color:var(--blue)">S1</strong> → les <strong style="color:var(--lime)">échauffements se calculent automatiquement</strong> → enregistrer après la séance. Les séries S3 marquées "/" deviennent actives en Phase 2.
+  </div>
+  <div class="section-label">Programme – 5 jours / semaine</div>
+  <div id="training-container"></div>
+  <div class="info-box" style="margin-top:16px">
+    <strong>Ordre des séances :</strong> Jour 1 Arms · Jour 2 Quadriceps · Jour 3 Pull · Jour 4 Ischio-Fessiers · Jour 5 Push<br>
+    <span style="font-size:0.8rem">Jeudi : repos ou Muay Thai. Surveiller récupération épaules Push→Arms.</span>
+  </div>
+</div>
+
+<!-- ===== SUPPLEMENTS TAB ===== -->
+<div id="tab-supplements" class="tab-panel">
+  <div class="info-box">
+    Stack validée. <strong>Timing optimal</strong> pour maximiser la prise de masse et la récupération.
+  </div>
+  <div class="section-label">Stack & Timing</div>
+  <div class="supps-grid">
+    <div class="supp-card">
+      <div class="supp-name">Omegabiane EPA (PiLèje)</div>
+      <div class="supp-when">🌅 Repas 1 ou 3 · quotidien</div>
+      <div class="supp-dose">2–3 gélules avec un repas · récupération, anti-inflammatoire, cardio</div>
+    </div>
+    <div class="supp-card">
+      <div class="supp-name">Cyborg Sport Collagen Pro</div>
+      <div class="supp-when">🌅 Repas 1 + 🌙 Coucher · quotidien</div>
+      <div class="supp-dose">1 dose matin + 1 dose soir · tendons, articulations, récupération nocturne</div>
+    </div>
+    <div class="supp-card">
+      <div class="supp-name">Cyborg Sport Grass Fed WPI</div>
+      <div class="supp-when">🏋️ Repas 2 + Repas 4</div>
+      <div class="supp-dose">30g en shaker eau · compléter les apports protéiques journaliers</div>
+    </div>
+    <div class="supp-card">
+      <div class="supp-name">Legit Créatine Monohydrate</div>
+      <div class="supp-when">🌅 Repas 1 (repos) · 🏋️ Repas 4 (entraîn.)</div>
+      <div class="supp-dose">3–5g quotidien · jours repos : repas 1 · jours entraîn : repas 4 pré-training</div>
+    </div>
+    <div class="supp-card">
+      <div class="supp-name">Legit EAA Recovery</div>
+      <div class="supp-when">🏋️ Post-training 19h30 · entraîn. only</div>
+      <div class="supp-dose">1 dose 30min après séance · synthèse protéique post-exercice</div>
+    </div>
+    <div class="supp-card">
+      <div class="supp-name">Emrald Labs Multi-Vitamin Gummy</div>
+      <div class="supp-when">🌅 Repas 1 ou 2 · quotidien</div>
+      <div class="supp-dose">2 gummies avec le repas · combler les microcarences liées à l'entraînement</div>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:4px">Planning journalier</div>
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:24px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+      <thead><tr style="background:var(--card2);">
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Horaire</th>
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Action</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">6h00</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Repas 1 · EPA · Collagen Pro · Multivitamine · Créatine (jours repos uniquement)</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">9h00</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Repas 2 · WPI shaker eau</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">12h00</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Repas 3 (déjeuner principal)</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">15h30</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Repas 4 · WPI · Créatine (jours entraîn. uniquement)</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">18h00</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Séance salle</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">19h30</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Legit EAA Recovery post-training</td></tr>
+        <tr><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C; color:var(--lime); font-weight:700; white-space:nowrap;">20h00</td><td style="padding:8px 15px; border-bottom:1px solid #1C1C1C;">Repas 5 (dîner)</td></tr>
+        <tr><td style="padding:8px 15px; color:var(--lime); font-weight:700; white-space:nowrap;">21h30</td><td style="padding:8px 15px;">Collagen Pro avant coucher (dose soir)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ===== POIDS TAB ===== -->
+<div id="tab-poids" class="tab-panel">
+  <div class="info-box">
+    Saisis tes pesées chaque matin à jeun. Moyenne hebdomadaire = base des ajustements nutritionnels. Données sauvegardées localement.
+  </div>
+  <div class="section-label">Prise de pesée</div>
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px;">
+    <div style="display:flex; gap:11px; flex-wrap:wrap; align-items:flex-end;">
+      <div style="display:flex; flex-direction:column; gap:5px; flex:1; min-width:130px;">
+        <label style="font-size:0.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">Date</label>
+        <input type="date" id="inp-date" style="background:#1A1A1A; border:1px solid var(--border); color:var(--text); border-radius:6px; padding:8px 11px; font-family:'Barlow',sans-serif; font-size:0.88rem;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:5px; flex:1; min-width:110px;">
+        <label style="font-size:0.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">Poids (kg)</label>
+        <input type="number" id="inp-poids" step="0.1" min="50" max="150" placeholder="74.4" style="background:#1A1A1A; border:1px solid var(--border); color:var(--text); border-radius:6px; padding:8px 11px; font-family:'Barlow',sans-serif; font-size:0.88rem;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:5px; flex:1; min-width:130px;">
+        <label style="font-size:0.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">Note (optionnel)</label>
+        <input type="text" id="inp-note" placeholder="bonne séance, dormi 8h…" style="background:#1A1A1A; border:1px solid var(--border); color:var(--text); border-radius:6px; padding:8px 11px; font-family:'Barlow',sans-serif; font-size:0.88rem;">
+      </div>
+      <button onclick="ajouterPesee()" style="background:var(--lime); color:#0A0A0A; border:none; border-radius:6px; padding:9px 20px; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:0.92rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; white-space:nowrap;">Enregistrer</button>
+    </div>
+  </div>
+  <div class="section-label">Courbe de progression</div>
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px;">
+    <canvas id="chartPoids" height="120" style="display:none;"></canvas>
+    <p id="chart-empty" style="text-align:center; color:var(--muted); font-size:0.83rem; padding:18px 0;">Aucune donnée — commence à saisir tes pesées !</p>
+  </div>
+  <div class="section-label">Historique</div>
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:14px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.84rem;" id="table-pesees">
+      <thead><tr style="background:var(--card2);">
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Date</th>
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Poids</th>
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Δ</th>
+        <th style="padding:9px 15px; text-align:left; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border);">Note</th>
+        <th style="padding:9px 15px; border-bottom:1px solid var(--border);"></th>
+      </tr></thead>
+      <tbody id="tbody-pesees">
+        <tr><td colspan="5" style="padding:15px; text-align:center; color:var(--muted); font-size:0.82rem;">Aucune pesée enregistrée</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:24px;">
+    <button onclick="exporterResume()" style="background:none; border:1px solid var(--border); color:var(--muted); font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; padding:7px 15px; border-radius:6px; cursor:pointer;">📋 Copier résumé semaine</button>
+    <button onclick="if(confirm('Effacer tout l\'historique poids ?')){localStorage.removeItem('jerome_pesees');chargerPesees();}" style="background:none; border:1px solid #2A1010; color:#FF6B6B; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; padding:7px 15px; border-radius:6px; cursor:pointer;">🗑 Effacer tout</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ===== PROGRAMME DATA V3 =====
+// Ordre : 1-Arms, 2-Quadriceps, 3-Pull, 4-Ischio-Fessiers, 5-Push
+const PROGRAM = [
+  {
+    day:1, label:"Arms — Triceps · Biceps",
+    progression:[
+      "Semaines 1–4 : établir les charges de base sur dips et preacher curl",
+      "Semaines 5–8 : passer dips lestés + preacher curl à 3 séries (*)",
+      "Semaines 9–12 : superset antagoniste skull crusher ↔ preacher curl pour densifier",
+      "Option Phase 3 : dernier set spider curl en drop set –20% pour brûlure maximale"
+    ],
+    exercises:[
+      {id:"v3_arms_dips",     name:"Dips lestés",                         alt:"Dips barre parallèles bodyweight ou Dips machine",  sets:"2→3*", reps:"8–10",  rest:"90s",  wu:3},
+      {id:"v3_arms_skull",    name:"EZ bar skull crusher",                alt:"Dumbbell skull crusher ou French press haltère",    sets:"3",    reps:"10",    rest:"60s",  wu:1},
+      {id:"v3_arms_kickback", name:"Dumbbell kickback",                   alt:"Rope kickback câble ou Bench kickback",             sets:"3",    reps:"12",    rest:"60s",  wu:1},
+      {id:"v3_arms_preacher", name:"Preacher curl EZ bar",                alt:"Preacher curl haltère ou Curl câble barre EZ",      sets:"2→3*", reps:"8",     rest:"90s",  wu:2},
+      {id:"v3_arms_spider",   name:"Spider curl",                         alt:"Concentration curl ou Incline dumbbell curl",       sets:"2",    reps:"8–10",  rest:"60s",  wu:1},
+      {id:"v3_arms_hammer",   name:"Hammer curl",                         alt:"Hammer curl câble ou Zottman curl",                 sets:"3",    reps:"12",    rest:"60s",  wu:1},
+      {id:"v3_arms_reverse",  name:"Reverse curl barre EZ",               alt:"Reverse curl barre droite ou Reverse curl câble",   sets:"2",    reps:"12",    rest:"60s",  wu:1},
+    ]
+  },
+  {
+    day:2, label:"Jambes A — Quadriceps · Mollets (Gastros)",
+    progression:[
+      "Squat barre libre : rupture totale vs programme précédent · largeur épaules, descente sous parallèle, dos neutre",
+      "Semaines 1–4 : technique prioritaire sur le squat, charges modérées",
+      "Semaines 5–8 : passer squat barre libre + bulgarian à 3 séries (*)",
+      "Semaines 9–12 : ajouter 2.5–5kg sur squat si toutes reps complètes",
+      "Sissy squat : commencer sans charge · tenir un support, corps gainé, genoux vers l'avant",
+      "Standing calf raises : amplitude complète, 2s contraction haute, 2s descente"
+    ],
+    exercises:[
+      {id:"v3_quadA_squat",    name:"Squat barre libre",                  alt:"Hack squat machine ou Goblet squat haltère",        sets:"2→3*", reps:"6–8",   rest:"2min", wu:3},
+      {id:"v3_quadA_bulgarian",name:"Bulgarian split squat",              alt:"Fente avant haltères ou Fente bulgare Smith",        sets:"2→3*", reps:"10/jambe",rest:"90s", wu:2},
+      {id:"v3_quadA_sissy",    name:"Sissy squat",                        alt:"Leg extension ou Sissy squat lesté",                sets:"2",    reps:"12",    rest:"60s",  wu:1},
+      {id:"v3_quadA_calf",     name:"Seated calf raises",                 alt:"Calf raises machine assise ou Leg press calf",      sets:"3",    reps:"15",    rest:"60s",  wu:1},
+    ]
+  },
+  {
+    day:3, label:"Pull — Dos · Biceps (rappel)",
+    progression:[
+      "Traction assistée : réduire l'assistance de 5kg toutes les 3–4 semaines",
+      "Semaines 5–8 : passer traction + single-arm row à 3 séries (*)",
+      "Pendlay row : chaque rep repart du sol · dos horizontal strict, mouvement explosif",
+      "Face pull : couvre deltoïde postérieur + coiffe des rotateurs · amplitude complète",
+      "Semaines 9–12 : traction bodyweight si assistance réduite à 0"
+    ],
+    exercises:[
+      {id:"v3_pull_pullup",     name:"Traction assistée machine",         alt:"Lat pulldown prise large ou Traction élastique",    sets:"2→3*", reps:"6–8",   rest:"2min", wu:2},
+      {id:"v3_pull_sarow",      name:"Dumbbell single-arm row",           alt:"Pendlay row barre ou Kroc row",                     sets:"2→3*", reps:"8–10",  rest:"90s",  wu:2},
+      {id:"v3_pull_pendlay",    name:"Pendlay row",                       alt:"Barbell row ou Yates row",                          sets:"2",    reps:"8",     rest:"90s",  wu:1},
+      {id:"v3_pull_facepull",   name:"Face pull (corde ou élastique)",    alt:"Band pull-apart ou Rear delt fly haltères penché",  sets:"2",    reps:"15",    rest:"60s",  wu:1},
+      {id:"v3_pull_inclinecurl",name:"Incline dumbbell curl",             alt:"Curl haltères assis ou Curl barre EZ",              sets:"3",    reps:"10",    rest:"60s",  wu:1},
+      {id:"v3_pull_hammer",    name:"Hammer curl",                        alt:"Hammer curl câble ou Zottman curl",                 sets:"3",    reps:"12",    rest:"60s",  wu:1},
+      {id:"v3_pull_pronation", name:"Pronation haltères",                 alt:"Pronation barre EZ ou Pronation poulie",            sets:"2",    reps:"12",    rest:"60s",  wu:1},
+    ]
+  },
+  {
+    day:4, label:"Jambes B — Ischio-Fessiers · Mollets (Soléaires)",
+    progression:[
+      "RDL haltères : rupture totale avec Smith RDL · amplitude naturelle, étirement ischio maximal",
+      "Semaines 5–8 : passer seated leg curl à 3 séries (*)",
+      "Seated calf raises : ciblage soléaire (genou fléchi 90°), amplitude complète",
+      "Option Phase 3 : finir seated leg curl par 1 drop set –20%",
+      "V4 (dans 3 mois) : hip thrust barre remplacera l'adductor machine"
+    ],
+    exercises:[
+      {id:"v3_ischio_rdl",     name:"Romanian deadlift haltères",         alt:"RDL barre libre ou Good morning barre",             sets:"3",    reps:"8",     rest:"90s",  wu:2},
+      {id:"v3_ischio_legcurl", name:"Lying leg curl",                     alt:"Seated leg curl ou Nordic curl lent",               sets:"2→3*", reps:"10",    rest:"60s",  wu:1},
+      {id:"v3_ischio_adductor",name:"Copenhagen plank",                   alt:"Adductor machine ou Sumo squat haltère",           sets:"3",    reps:"20s",   rest:"60s",  wu:0},
+      {id:"v3_ischio_calf",    name:"Standing calf raises",               alt:"Leg press calf raises ou Calf raises Smith",        sets:"3",    reps:"15",    rest:"60s",  wu:1},
+    ]
+  },
+  {
+    day:5, label:"Push — Pectoraux · Épaules · Triceps",
+    progression:[
+      "Pec : incliné haltères (haut pec) + plat haltères (bas/milieu) + dumbbell fly (étirement profond)",
+      "Épaules : seated lateral raise machine (faisceau médian) · amplitude en essuie-glace complète",
+      "Semaines 5–8 : passer incline press + flat press à 3 séries (*)",
+      "Semaines 9–12 : ajouter 1 drop set sur dumbbell fly –20% pour brûlure maximale bas des pecs"
+    ],
+    exercises:[
+      {id:"v3_push_incline",    name:"Incline dumbbell press (30°)",      alt:"Incline Smith press ou Incline barre libre",        sets:"2→3*", reps:"8",     rest:"90s",  wu:2},
+      {id:"v3_push_flat",       name:"Flat dumbbell press",               alt:"Développé couché barre libre ou Smith machine",     sets:"2→3*", reps:"8",     rest:"90s",  wu:2},
+      {id:"v3_push_fly",        name:"Dumbbell fly couché",               alt:"Pec deck fly ou Cable crossover poulie haute",      sets:"2",    reps:"12",    rest:"60s",  wu:1},
+      {id:"v3_push_lateral",    name:"Seated lateral raise machine",      alt:"Dumbbell lateral raise ou Cable lateral raise",     sets:"3",    reps:"10",    rest:"90s",  wu:1},
+      {id:"v3_push_dboverhead", name:"Overhead dumbbell triceps extension",alt:"Rope overhead câble ou EZ bar overhead",           sets:"3",    reps:"10",    rest:"60s",  wu:1},
+      {id:"v3_push_pronation",  name:"Pronation haltères",                alt:"Pronation barre EZ ou Pronation poulie",           sets:"2",    reps:"12",    rest:"60s",  wu:1},
+    ]
+  }
+];
+
+const WU = [
+  {pct:50, reps:12},
+  {pct:70, reps:8},
+  {pct:85, reps:5},
+];
+
+// ===== PHASE CALCULATION (départ 01/06/2026) =====
+function getPhaseInfo() {
+  const start = new Date('2026-06-01T00:00:00');
+  const today = new Date();
+  const days = Math.floor((today - start) / 86400000);
+  const week = Math.min(12, Math.max(1, Math.floor(days / 7) + 1));
+  const phase = week <= 4 ? 1 : week <= 8 ? 2 : 3;
+  const label = ['','Fondation','Volume +','Intensité +'][phase];
+  return {week, phase, label};
+}
+
+function activeSets(setsStr, phase) {
+  if (setsStr === '3') return 3;
+  if (setsStr === '2') return 2;
+  return phase >= 2 ? 3 : 2;
+}
+
+// ===== STORAGE =====
+function getHist(id) { try { return JSON.parse(localStorage.getItem('jh_'+id)||'[]'); } catch{return[];} }
+function setHist(id, d) { localStorage.setItem('jh_'+id, JSON.stringify(d)); }
+function r05(v) { return Math.round(v*2)/2; }
+
+// ===== BUILD EXERCISE CARD =====
+function buildCard(ex, phase) {
+  const nSets = activeSets(ex.sets, phase);
+  const hist = getHist(ex.id);
+  const lastW = hist.length && hist[hist.length-1].sets[0]?.w ? hist[hist.length-1].sets[0].w+' kg' : '—';
+
+  const wuRows = [0,1,2].map(i => {
+    const on = i < ex.wu;
+    return `<div class="wu-row" id="wur_${ex.id}_${i+1}" style="${on ? '' : 'display:none;'}">
+      <span class="cell-lbl">C${i+1}</span>
+      <span class="wu-val" id="wv_${ex.id}_${i+1}">— × ${WU[i].reps} reps</span>
+      <span class="cell-pct">${WU[i].pct}%</span>
+    </div>`;
+  }).join('');
+
+  const setsLabel = ex.sets === '2→3*'
+    ? `<span style="color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.5px;">2→3★</span> <span style="color:var(--muted);font-size:.68rem;">(S3 actif Phase 2+)</span>`
+    : '';
+  const wsRows = [1,2,3].map(i => {
+    const on = i <= nSets;
+    return `<div class="ws-row${on?'':' ws-slash'}">
+      <span class="cell-lbl s">S${i}</span>
+      ${on
+        ? `<input type="number" step="0.5" class="weight-inp" id="si_${ex.id}_${i}" placeholder="kg"${i===1?` oninput="calcWU('${ex.id}',${ex.wu},parseFloat(this.value))" onchange="autoFillSets('${ex.id}',${nSets},parseFloat(this.value))"`:''}>
+           <span class="reps-txt">× ${ex.reps}</span>`
+        : `<span class="ws-slash-txt">/</span><span class="reps-txt" style="opacity:.3;font-size:.7rem;">actif Phase 2</span>`
+      }
+    </div>`;
+  }).join('');
+
+  const histHTML = !hist.length
+    ? `<span class="no-hist">Aucune session enregistrée</span>`
+    : hist.slice(-3).reverse().map(h => {
+        const d = new Date(h.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+        const s = h.sets.filter(x=>x.w!=null).map(x=>`S${x.n}:${x.w}kg`).join(' · ');
+        return `<div class="hist-row"><span class="hist-d">${d}</span><span class="hist-s">${s}</span></div>`;
+      }).join('');
+
+  return `
+<div class="ex-card" id="card_${ex.id}">
+  <div class="ex-hdr" onclick="toggleEx('${ex.id}')">
+    <span class="ex-hdr-name">${ex.name}</span>
+    <span class="ex-last-w" id="lw_${ex.id}">${lastW}</span>
+    <span class="ex-chev" id="ec_${ex.id}">▼</span>
+  </div>
+  <div class="ex-body" id="eb_${ex.id}" style="display:none;">
+    <div class="ex-alt">${ex.alt}</div>
+    <div class="ex-box ex-box-wu">
+      <div class="ex-box-title">Échauffement — saisir S1 pour calculer</div>
+      ${wuRows}
+    </div>
+    <div class="ex-box ex-box-work">
+      <div class="ex-box-hdr">
+        <span class="ex-box-title" style="color:var(--blue);margin-bottom:0;">Séries effectives</span>
+        <span class="target-lbl">${nSets} × ${ex.reps}</span>
+        ${setsLabel}
+        <span class="rest-lbl">⏱ ${ex.rest}</span>
+      </div>
+      ${wsRows}
+      <button class="save-btn" onclick="saveSess('${ex.id}',${nSets})">✓ Enregistrer la séance</button>
+    </div>
+    <div class="ex-box ex-box-hist">
+      <div class="ex-box-title">Historique (3 dernières séances)</div>
+      <div id="hi_${ex.id}">${histHTML}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ===== TOGGLE EXERCISE =====
+function toggleEx(id) {
+  const b = document.getElementById('eb_'+id);
+  const c = document.getElementById('ec_'+id);
+  const open = b.style.display !== 'none';
+  b.style.display = open ? 'none' : 'block';
+  c.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ===== DYNAMIC WARM-UP COUNT =====
+function dynWuCount(wuBase, weight) {
+  if (!weight || weight <= 0) return wuBase;
+  if (wuBase === 1) return 1;
+  if (wuBase === 2) return weight <= 20 ? 1 : 2;
+  if (wuBase === 3) return weight <= 40 ? 2 : 3;
+  return wuBase;
+}
+
+// ===== WARM-UP CALCULATION =====
+function calcWU(exId, wuBase, weight) {
+  if (isNaN(weight)) weight = 0;
+  const dyn = dynWuCount(wuBase, weight);
+  for (let i = 1; i <= 3; i++) {
+    const row = document.getElementById('wur_'+exId+'_'+i);
+    const valEl = document.getElementById('wv_'+exId+'_'+i);
+    if (!row || !valEl) continue;
+    if (i > dyn) { row.style.display = 'none'; continue; }
+    row.style.display = 'flex';
+    if (!weight || weight <= 0) {
+      valEl.textContent = '— × '+WU[i-1].reps+' reps';
+    } else {
+      const w = r05(weight * WU[i-1].pct / 100);
+      valEl.textContent = `${w} kg × ${WU[i-1].reps} reps`;
+    }
+  }
+}
+
+// ===== AUTO-FILL S2/S3 =====
+function autoFillSets(exId, nSets, s1Val) {
+  if (isNaN(s1Val) || s1Val <= 0) return;
+  for (let i = 2; i <= nSets; i++) {
+    const el = document.getElementById('si_'+exId+'_'+i);
+    if (el && !el.value) el.value = s1Val;
+  }
+}
+
+// ===== SAVE SESSION =====
+function saveSess(exId, nSets) {
+  const today = new Date().toISOString().split('T')[0];
+  const sets = [];
+  for (let i = 1; i <= nSets; i++) {
+    const el = document.getElementById('si_'+exId+'_'+i);
+    const w = el ? parseFloat(el.value) : null;
+    sets.push({n:i, w: (el && !isNaN(w) && w > 0) ? w : null});
+  }
+  if (sets.every(s => s.w == null)) { alert('Saisis au moins S1 pour enregistrer.'); return; }
+  const hist = getHist(exId);
+  const idx = hist.findIndex(h => h.date === today);
+  if (idx >= 0) hist[idx] = {date:today, sets};
+  else hist.push({date:today, sets});
+  setHist(exId, hist);
+  refreshHist(exId);
+  const lw = document.getElementById('lw_'+exId);
+  if (lw && sets[0]?.w) lw.textContent = sets[0].w+' kg';
+  const btn = document.querySelector(`#card_${exId} .save-btn`);
+  if (btn) {
+    btn.textContent = '✅ Enregistré !';
+    btn.style.background = '#4DABF7';
+    btn.style.color = '#000';
+    setTimeout(() => { btn.textContent = '✓ Enregistrer la séance'; btn.style.background=''; btn.style.color=''; }, 1800);
+  }
+}
+
+function refreshHist(exId) {
+  const el = document.getElementById('hi_'+exId);
+  if (!el) return;
+  const hist = getHist(exId);
+  if (!hist.length) { el.innerHTML = '<span class="no-hist">Aucune session enregistrée</span>'; return; }
+  el.innerHTML = hist.slice(-3).reverse().map(h => {
+    const d = new Date(h.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    const s = h.sets.filter(x=>x.w!=null).map(x=>`S${x.n}:${x.w}kg`).join(' · ');
+    return `<div class="hist-row"><span class="hist-d">${d}</span><span class="hist-s">${s}</span></div>`;
+  }).join('');
+}
+
+// ===== INIT TRAINING =====
+function initTraining() {
+  const {week, phase, label} = getPhaseInfo();
+  document.getElementById('chip-week').innerHTML = `Semaine <strong>${week}</strong>`;
+  document.getElementById('chip-phase').innerHTML = `Phase <strong>${phase} – ${label}</strong>`;
+  const container = document.getElementById('training-container');
+  if (!container) return;
+  let html = '';
+  PROGRAM.forEach(day => {
+    const exHtml = day.exercises.map(ex => buildCard(ex, phase)).join('');
+    const progHtml = day.progression.map(p => `<div class="prog-item">${p}</div>`).join('');
+    html += `
+<div class="day-card open">
+  <div class="day-header" onclick="toggleDay(this)">
+    <span class="day-badge">Jour ${day.day}</span>
+    <span class="day-title">${day.label}</span>
+    <span class="day-chevron">▼</span>
+  </div>
+  <div class="day-body">
+    ${exHtml}
+    <div class="prog-box">
+      <div class="prog-title">⚡ Progression recommandée</div>
+      ${progHtml}
+    </div>
+  </div>
+</div>`;
+  });
+  container.innerHTML = html;
+}
+
+
+// ===== UI TOGGLES =====
+function toggleMeal(header) { header.parentElement.classList.toggle('open'); }
+function toggleDay(header)  { header.parentElement.classList.toggle('open'); }
+function toggleVariantBox(btn) {
+  const box = btn.nextElementSibling;
+  box.classList.toggle('open');
+  btn.textContent = box.classList.contains('open') ? '− Fermer les variantes' : '+ Variantes équivalentes';
+}
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'poids') renderChart();
+}
+
+// ===== WEIGHT TRACKING =====
+let chartInst = null;
+function getPesees() { try { return JSON.parse(localStorage.getItem('jerome_pesees')||'[]'); } catch{return[];} }
+
+function ajouterPesee() {
+  const date = document.getElementById('inp-date').value;
+  const poids = parseFloat(document.getElementById('inp-poids').value);
+  const note = document.getElementById('inp-note').value.trim();
+  if (!date || isNaN(poids)) { alert('Saisis une date et un poids valide.'); return; }
+  const pesees = getPesees();
+  const idx = pesees.findIndex(p => p.date === date);
+  if (idx >= 0) pesees[idx] = {date,poids,note};
+  else pesees.push({date,poids,note});
+  pesees.sort((a,b) => a.date.localeCompare(b.date));
+  localStorage.setItem('jerome_pesees', JSON.stringify(pesees));
+  document.getElementById('inp-note').value = '';
+  chargerPesees(); renderChart();
+}
+
+function supprimerPesee(date) {
+  localStorage.setItem('jerome_pesees', JSON.stringify(getPesees().filter(p=>p.date!==date)));
+  chargerPesees(); renderChart();
+}
+
+function chargerPesees() {
+  const pesees = getPesees();
+  const tbody = document.getElementById('tbody-pesees');
+  if (!pesees.length) { tbody.innerHTML='<tr><td colspan="5" style="padding:15px;text-align:center;color:var(--muted);font-size:.82rem;">Aucune pesée enregistrée</td></tr>'; return; }
+  const rev = [...pesees].reverse();
+  tbody.innerHTML = rev.map((p,i) => {
+    const prev = rev[i+1];
+    let delta = '<span style="color:#555">—</span>';
+    if (prev) { const d=(p.poids-prev.poids).toFixed(1); const c=d>0?'#FF6B6B':d<0?'#C6F135':'#777'; delta=`<span style="color:${c};font-weight:700;">${d>0?'+':''}${d} kg</span>`; }
+    const ds = new Date(p.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+    return `<tr>
+      <td style="padding:8px 15px;border-bottom:1px solid #1C1C1C;color:var(--muted);">${ds}</td>
+      <td style="padding:8px 15px;border-bottom:1px solid #1C1C1C;color:var(--lime);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;">${p.poids} kg</td>
+      <td style="padding:8px 15px;border-bottom:1px solid #1C1C1C;">${delta}</td>
+      <td style="padding:8px 15px;border-bottom:1px solid #1C1C1C;color:var(--muted);font-size:.79rem;font-style:italic;">${p.note||''}</td>
+      <td style="padding:8px 15px;border-bottom:1px solid #1C1C1C;text-align:right;"><button onclick="supprimerPesee('${p.date}')" style="background:none;border:none;color:#555;cursor:pointer;font-size:.83rem;">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderChart() {
+  const pesees = getPesees();
+  const canvas = document.getElementById('chartPoids');
+  const empty = document.getElementById('chart-empty');
+  if (pesees.length < 2) { empty.style.display='block'; canvas.style.display='none'; return; }
+  empty.style.display='none'; canvas.style.display='block';
+  const labels = pesees.map(p => new Date(p.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}));
+  const data = pesees.map(p => p.poids);
+  if (chartInst) chartInst.destroy();
+  chartInst = new Chart(canvas, {
+    type:'line',
+    data:{ labels, datasets:[{ label:'Poids (kg)', data, borderColor:'#C6F135', backgroundColor:'rgba(198,241,53,0.07)', pointBackgroundColor:'#C6F135', pointRadius:5, tension:0.3, fill:true }] },
+    options:{ responsive:true, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y} kg`}} }, scales:{
+      x:{ticks:{color:'#777',font:{family:'Barlow'}},grid:{color:'#1C1C1C'}},
+      y:{ticks:{color:'#777',font:{family:'Barlow'},callback:v=>v+' kg'},grid:{color:'#1C1C1C'},suggestedMin:Math.min(...data)-1,suggestedMax:Math.max(...data)+1}
+    }}
+  });
+}
+
+function exporterResume() {
+  const pesees = getPesees();
+  if (!pesees.length) { alert('Aucune pesée.'); return; }
+  const recent = pesees.slice(-7);
+  let txt = '📊 SUIVI POIDS – SEMAINE\n─────────────────────\n';
+  recent.forEach(p => {
+    const d = new Date(p.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+    txt += `${d} : ${p.poids} kg${p.note?' · '+p.note:''}\n`;
+  });
+  if (recent.length>=2) { const diff=(recent[recent.length-1].poids-recent[0].poids).toFixed(1); txt+=`─────────────────────\nÉvolution : ${diff>0?'+':''}${diff} kg\n`; }
+  txt += `Poids actuel : ${pesees[pesees.length-1].poids} kg\nPoids départ : 74.4 kg`;
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Résumé copié !'));
+}
+
+// ===== INIT PR V2 (poids de référence issus du programme précédent) =====
+function initPRv2() {
+  const prV2 = [
+    // Exercices V3 avec référence V2
+    { id:'v3_quadA_legpress',       w:160 }, // Leg press inclinée
+    { id:'v3_quadA_legext',         w:90  }, // Leg extension
+    { id:'v3_ischio_legcurl',       w:30  }, // Seated leg curl
+    { id:'v3_push_lateral',         w:54  }, // Seated lateral raise machine
+    // Exercices V2 purs (hors programme V3)
+    { id:'v2_tri_smithclosegrip',   w:25  }, // Smith machine close grip bench press
+    { id:'v2_tri_ropeoverhead',     w:25  }, // Rope overhead triceps extension
+    { id:'v2_bi_barbellcurl',       w:14  }, // Barbell curl
+    { id:'v2_bi_straightbarcable',  w:40  }, // Straight bar cable curl
+    { id:'v2_bi_zbarcurl',          w:20  }, // Élévation barre Z avant-bras
+    { id:'v2_quad_pendulum',        w:100 }, // Pendulum squat
+    { id:'v2_quad_calfsmith',       w:40  }, // Mollet debout barre guidée
+    { id:'v2_pec_deckfly',          w:40  }, // Pec deck fly
+    { id:'v2_back_tbar',            w:40  }, // Machine T-Bar row
+    { id:'v2_back_seatedrow',       w:70  }, // Seated row
+    // Sans poids connu — entrées vides (affichage — en Fiche PR)
+    // v2_tri_vbar, v2_tri_ropedown, v2_pec_inclinesmithpress, v2_pec_machinepress
+    // v2_sho_cablelateral, v2_sho_machineshoulder, v2_sho_reversepecdeck
+    // v2_bi_machinepreacher, v2_bi_pronation, v2_back_latpulldown
+    // v2_ischio_smithrdl, v2_ischio_adductor, v2_ischio_calfassis
+  ];
+  const initDate = '2026-05-31'; // dernier jour V2
+  prV2.forEach(({id, w}) => {
+    const key = 'jh_' + id;
+    // N'écraser que si aucun historique existant pour cet exercice
+    if (!localStorage.getItem(key)) {
+      const entry = { date: initDate, sets: [{n:1, w}] };
+      localStorage.setItem(key, JSON.stringify([entry]));
+    }
+  });
+}
+
+// ===== BOOT =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+  initPRv2();
+  chargerPesees();
+  initTraining();
+});
+</script>
+</body>
+</html>
